@@ -1,0 +1,292 @@
+if CheckBox_price_2.Checked=true then begin
+        if ADOConnection1.Connected=false then begin
+           dbgrid1.Visible:=true;
+           Form4.Show;
+           Form4.Label_error.Caption:='Â³äñóòí³é çâÿçîê ³ç áàçîþ äàíèõ';
+           exit;
+        end;
+        if profit_transaction=0 then begin
+           Form4.Show;
+           Form4.Label_error.Caption:='Ðîìêó âèáåðè ïðîô³ò/ê³ëüê³ñòü çä³ëîê!';
+           Form1.CheckBox_year.Checked:=false;
+           exit;
+        end;
+        if Form23.CheckListBox1.ItemIndex<0 then begin
+           Form23.CheckListBox1.clear;
+           ADOQuery1.SQL.Clear;
+           ADOQuery1.SQL.Add('SELECT Nameprice from price');
+           ADOQuery1.Active:=true;
+           ADOQuery1.First;
+           index_price:=0;
+           while not ADOQuery1.eof do begin
+                 Form23.CheckListBox1.Items.Add(''+ADOQuery1.FieldValues['Nameprice']+'');
+                 Form23.CheckListBox1.checked[index_price]:=true;
+                 inc(index_price);
+                 ADOQuery1.Next;
+           end;
+        end;
+        //
+        ADOQuery1.SQL.Clear;
+        ADOQuery1.SQL.Add('SELECT id_price,SUM(Profit) AS Sum_profit,Count(Profit) AS Count_profit FROM report Where');
+        indicator_year:=0;
+        for index_year:=0 to Form2.CheckListBox1.count-1 do begin
+            if Form2.CheckListBox1.Checked[index_year]=true then begin
+               inc(indicator_year);
+               if indicator_year=1 then begin
+                  ADOQuery1.SQL.Add('(year='''+Form2.CheckListBox1.Items[index_year]+'''');
+               end;
+               if indicator_year>1 then begin
+                  ADOQuery1.SQL.Add('or year='''+Form2.CheckListBox1.Items[index_year]+'''');
+               end;
+            end;
+        end;
+        ADOQuery1.SQL.Add(')and');
+        indicator_month:=0;
+        for index_month:=1 to 12 do begin
+            if Form5.CheckListBox1.Checked[index_month]=true then begin
+               inc(indicator_month);
+               if indicator_month=1 then begin
+                  ADOQuery1.SQL.Add('(month='''+inttostr(index_month)+'''');
+               end;
+               if indicator_month>1 then begin
+                  ADOQuery1.SQL.Add(' or month='''+inttostr(index_month)+'''');
+               end;
+            end;
+        end;
+        ADOQuery1.SQL.Add(')and');
+        indicator_day:=0;
+        for index_day:=0 to 31 do begin
+            if Form6.CheckListBox1.Checked[index_day]=true then begin
+               inc(indicator_day);
+               if indicator_day=1 then begin
+                  ADOQuery1.SQL.Add('(day='''+inttostr(index_day)+'''');
+               end;
+               if indicator_day>1 then begin
+                  ADOQuery1.SQL.Add(' or day='''+inttostr(index_day)+'''');
+               end;
+            end;
+        end;
+        ADOQuery1.SQL.Add(')and');
+        indicator_hour:=0;
+        for index_hour:=0 to 6 do begin
+            if Form8.CheckListBox1.Checked[index_hour]=true then begin
+               inc(indicator_hour);
+               if indicator_hour=1 then begin
+                  ADOQuery1.SQL.Add('(id_time='''+IntToStr(index_hour+1)+'''');
+                  end;
+               if indicator_hour>1 then begin
+                     ADOQuery1.SQL.Add(' or id_time='''+IntToStr(index_hour+1)+'''');
+               end;
+            end;
+        end;
+        ADOQuery1.SQL.Add(')and');
+        indicator_high_low:=0;
+        for index_high_low:=0 to 1 do begin
+            if Form9.CheckListBox1.Checked[index_high_low]=true then begin
+               inc(indicator_high_low);
+               if indicator_high_low=1 then begin
+                  ADOQuery1.SQL.Add('(HighLow='''+IntToStr(index_high_low+1)+'''');
+               end;
+               if indicator_high_low>1 then begin
+                  ADOQuery1.SQL.Add(' or HighLow='''+IntToStr(index_high_low+1)+'''');
+               end;
+            end;
+        end;
+        ADOQuery1.SQL.Add(')and');
+        indicator_sectors:=0;
+        for index_sectors:=0 to 8 do begin
+            if Form10.CheckListBox1.Checked[index_sectors]=true then begin
+               inc(indicator_sectors);
+               if indicator_sectors=1 then begin
+                  ADOQuery1.SQL.Add('(id_sector='''+IntToStr(index_sectors+1)+'''');
+               end;
+               if indicator_sectors>1 then begin
+                  ADOQuery1.SQL.Add(' or id_sector='''+IntToStr(index_sectors+1)+'''');
+               end;
+            end;
+        end;
+        ADOQuery1.SQL.Add(')and');
+        indicator_accii:=0;
+        for index_accii:=0 to 639 do begin
+            if Form20.CheckListBox1.Checked[index_accii]=true then begin
+               inc(indicator_accii);
+               if indicator_accii=1 then begin
+                  ADOQuery1.SQL.Add('(id_accii='''+IntToStr(index_accii+1)+'''');
+               end;
+               if indicator_accii>1 then begin
+                  ADOQuery1.SQL.Add(' or id_accii='''+IntToStr(index_accii+1)+'''');
+               end;
+            end;
+        end;
+        ADOQuery1.SQL.Add(')and');
+        indicator_price:=0;
+        for index_price:=0 to 31 do begin
+            if Form12.CheckListBox1.Checked[index_price]=true then begin
+               inc(indicator_price);
+               if indicator_price=1 then begin
+                  ADOQuery1.SQL.Add('(id_price='''+IntToStr(index_price+1)+'''');
+               end;
+               if indicator_price>1 then begin
+                  ADOQuery1.SQL.Add(' or id_price='''+IntToStr(index_price+1)+'''');
+               end;
+            end;
+        end;
+        ADOQuery1.SQL.Add(')and');
+        indicator_timeframe:=0;
+        for index_timeframe:=0 to 3 do begin
+            if Form13.CheckListBox1.Checked[index_timeframe]=true then begin
+               inc(indicator_timeframe);
+               if indicator_timeframe=1 then begin
+                  ADOQuery1.SQL.Add('(timeframe='''+IntToStr(timeframe[index_timeframe])+'''');
+               end;
+               if indicator_timeframe>1 then begin
+                  ADOQuery1.SQL.Add(' or timeframe='''+IntToStr(timeframe[index_timeframe])+'''');
+               end;
+            end;
+        end;
+        ADOQuery1.SQL.Add(')and');
+        indicator_level:=0;
+        for index_level:=0 to 4 do begin
+            case index_level of
+                 0:temp_level:=50;
+                 1:temp_level:=25;
+                 2:temp_level:=10;
+                 3:temp_level:=5;
+                 4:temp_level:=1;
+            end;
+            if Form14.CheckListBox1.Checked[index_level]=true then begin
+               inc(indicator_level);
+               if indicator_level=1 then begin
+                  ADOQuery1.SQL.Add('(level='''+IntToStr(temp_level)+'''');
+               end;
+               if indicator_level>1 then begin
+                  ADOQuery1.SQL.Add(' or level='''+IntToStr(temp_level)+'''');
+               end;
+            end;
+        end;
+        ADOQuery1.SQL.Add(')and');
+        indicator_bar:=0;
+        for index_bar:=0 to 4 do begin
+            if Form15.CheckListBox1.Checked[index_bar]=true then begin
+               inc(indicator_bar);
+               if indicator_bar=1 then begin
+                  ADOQuery1.SQL.Add('(BarOfEntering='''+IntToStr(index_bar+4)+'''');
+               end;
+               if indicator_bar>1 then begin
+                  ADOQuery1.SQL.Add(' or BarOfEntering='''+IntToStr(index_bar+4)+'''');
+               end;
+            end;
+        end;
+        ADOQuery1.SQL.Add(')and');
+        indicator_Corridor:=0;
+        for index_Corridor:=0 to 3 do begin
+            if Form16.CheckListBox1.Checked[index_Corridor]=true then begin
+               inc(indicator_Corridor);
+               if indicator_Corridor=1 then begin
+                  ADOQuery1.SQL.Add('(Corridor='''+IntToStr(index_Corridor)+'''');
+               end;
+               if indicator_Corridor>1 then begin
+                  ADOQuery1.SQL.Add(' or Corridor='''+IntToStr(index_Corridor)+'''');
+               end;
+            end;
+        end;
+        ADOQuery1.SQL.Add(')and');
+        indicator_Breakdown:=0;
+        for index_Breakdown:=0 to 1 do begin
+            if Form17.CheckListBox1.Checked[index_Breakdown]=true then begin
+               inc(indicator_Breakdown);
+               if indicator_Breakdown=1 then begin
+                  ADOQuery1.SQL.Add('(Breakdown='''+IntToStr(index_Breakdown)+'''');
+               end;
+               if indicator_Breakdown>1 then begin
+                  ADOQuery1.SQL.Add(' or Breakdown='''+IntToStr(index_Breakdown)+'''');
+               end;
+            end;
+        end;
+        ADOQuery1.SQL.Add(')and');
+        indicator_stop:=0;
+        for index_stop:=0 to 9 do begin
+            if Form18.CheckListBox1.Checked[index_stop]=true then begin
+               inc(indicator_stop);
+               if indicator_stop=1 then begin
+                  ADOQuery1.SQL.Add('(stop='''+IntToStr(index_stop+1)+'''');
+               end;
+               if indicator_stop>1 then begin
+                  ADOQuery1.SQL.Add(' or stop='''+IntToStr(index_stop+1)+'''');
+               end;
+            end;
+        end;
+        ADOQuery1.SQL.Add(')and');
+        indicator_swimstop:=0;
+        for index_swimstop:=0 to 25 do begin
+            if Form19.CheckListBox1.Checked[index_swimstop]=true then begin
+               inc(indicator_swimstop);
+               if indicator_swimstop=1 then begin
+                  ADOQuery1.SQL.Add('(swimstop='''+IntToStr(index_swimstop)+'''')
+               end;
+               if indicator_swimstop>1 then begin
+                  ADOQuery1.SQL.Add(' or swimstop='''+IntToStr(index_swimstop)+'''');
+               end;
+            end;
+        end;
+        ADOQuery1.SQL.Add(')and');
+        indicator_setprofit:=0;
+        for index_setprofit:=0 to 50 do begin
+            if Form11.CheckListBox1.Checked[index_setprofit]=true then begin
+               inc(indicator_setprofit);
+               if indicator_setprofit=1 then begin
+                  ADOQuery1.SQL.Add('(SetProfit='''+IntToStr(index_setprofit)+'''')
+               end;
+               if indicator_setprofit>1 then begin
+                   ADOQuery1.SQL.Add(' or SetProfit='''+IntToStr(index_setprofit)+'''');
+               end;
+            end;
+        end;
+        ADOQuery1.SQL.Add(')and');
+        indicator_hour:=0;
+        for index_hour:=0 to 6 do begin
+            if Form22.CheckListBox1.Checked[index_hour]=true then begin
+               inc(indicator_hour);
+               if indicator_hour=1 then begin
+                  ADOQuery1.SQL.Add('(id_time='''+IntToStr(index_hour+1)+'''');
+                  end;
+               if indicator_hour>1 then begin
+                     ADOQuery1.SQL.Add(' or id_time='''+IntToStr(index_hour+1)+'''');
+               end;
+            end;
+        end;
+        ADOQuery1.SQL.Add(') GROUP BY id_price');
+        ADOQuery1.Active:=true;
+        ADOQuery1.First;
+        //
+        if profit_transaction=1 then begin
+           Form23.Show;
+           Form23.Caption:='Ã³ñòîãðàìà ïðèáóòêó  ïî ö³í³';
+           Form23.Chart1.Series[0].Clear;
+           ADOQuery1.First;
+           while not ADOQuery1.eof do begin
+              index_price:=ADOQuery1.FieldValues['id_price'];
+              if Form23.CheckListBox1.checked[index_price-1]=true then begin
+                 chart_x:=index_price;
+                 chart_y:=ADOQuery1.FieldValues['sum_profit'];
+                 Form23.Chart1.Series[0].AddXY(chart_x,chart_y);
+              end;
+              ADOQuery1.Next;
+            end;
+        end;
+        if profit_transaction=2 then begin
+           Form23.Show;
+           Form23.Caption:='Ã³ñòîãðàìà ê³ëüêîñò³ óãîä  ïî ö³íàõ';
+           Form23.Chart1.Series[0].Clear;
+           ADOQuery1.First;
+           while not ADOQuery1.eof do begin
+              index_price:=ADOQuery1.FieldValues['id_price'];
+              if Form23.CheckListBox1.checked[index_price-1]=true then begin
+                 chart_x:=index_price;
+                 chart_y:=ADOQuery1.FieldValues['count_profit'];
+                 Form23.Chart1.Series[0].AddXY(chart_x,chart_y);
+              end;
+              ADOQuery1.Next;
+            end;
+        end;
+     end;
